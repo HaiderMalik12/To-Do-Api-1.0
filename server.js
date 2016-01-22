@@ -18,8 +18,22 @@ res.send('To Do Api version no 1');
 
 //GET :/todos
 
+// Get /todos?completed=true
 app.get('/todos',function(req,res){
-res.json(todos);
+
+    var qureyParams=req.query;
+    var filterdTodos=todos;
+
+    if(qureyParams.hasOwnProperty('completed') && qureyParams.completed==='true')
+    {
+        filterdTodos= _.where(filterdTodos,{completed:true});
+    }
+    else if(qureyParams.hasOwnProperty('completed') && qureyParams.completed ==='false'){
+        filterdTodos= _.where(filterdTodos,{completed:false});
+    }
+
+    res.json(filterdTodos);
+
 });
 
 //Get:/todos/:id
@@ -86,6 +100,36 @@ app.delete('/todos/:id',function(req,res){
   
 
 });
+
+//PUT /todos/:id
+
+app.put('/todos/:id',function(req,res){
+  
+   var todoId = parseInt(req.params.id, 10);
+    var matchedTodo = _.findWhere(todos, {id: todoId});
+    var body = _.pick(req.body, 'description', 'completed');
+    var validAttributes = {};
+
+    if (!matchedTodo) {
+        return res.status(404).send();
+    }
+
+    if (body.hasOwnProperty('completed') && _.isBoolean(body.completed)) {
+        validAttributes.completed = body.completed;
+    } else if (body.hasOwnProperty('completed')) {
+        return res.status(400).send();
+    }
+
+    if (body.hasOwnProperty('description') && _.isString(body.description) && body.description.trim().length > 0) {
+        validAttributes.description = body.description;
+    } else if (body.hasOwnProperty('description')) {
+        return res.status(400).send();
+    }
+
+    _.extend(matchedTodo, validAttributes);
+    res.json(matchedTodo);
+});
+
 
 //listening Express on PORT
 
