@@ -30,13 +30,7 @@ var todoId=parseInt(req.params.id,10);
 
 var matchedTodo;
 
-todos.forEach(function(todo){
-   
-   if(todo.id === todoId)
-   {
-   	matchedTodo=todo;
-   }
-});
+matchedTodo=_.findWhere(todos,{id:todoId});
 
 if(matchedTodo)
 {
@@ -52,14 +46,23 @@ else{
 app.post('/todos',function(req,res){
     
     var body=req.body;
+   
+     //validate the input
+    if(!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0)
+     {
+     res.status(400).send();
+     }
+     else{
+
 
     body.id=todoNextId++;
 
     todos.push(body);
 
     res.send(body);
-
+}
 });
+
 //listening Express on PORT
 
 app.listen(PORT,function(){
