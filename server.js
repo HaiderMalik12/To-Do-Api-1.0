@@ -45,7 +45,8 @@ else{
 
 app.post('/todos',function(req,res){
     
-    var body=req.body;
+    //validate the body object has description and completed Property
+    var body= _.pick(req.body,'description','completed');
    
      //validate the input
     if(!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0)
@@ -56,6 +57,7 @@ app.post('/todos',function(req,res){
 
 
     body.id=todoNextId++;
+    body.description=body.description.trim();
 
     todos.push(body);
 
